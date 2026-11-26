@@ -14,8 +14,8 @@ provider:
 
 | 修改对象 | 必须同步更新 |
 |---|---|
-| 目录结构决策 | `docs/design_decisions.md`（修订 D11 或新增 D 编号，含理由与备选） |
-| 目录树 | `docs/architecture.md` §6 |
+| 目录结构决策 | `docs/common/design_decisions.md`（修订 D11/D12 或新增 D 编号，含理由与备选） |
+| 目录树 | `docs/common/architecture.md` §6 |
 | 仓库结构表 | `README.md` |
 | 文件归位规则 | `.codebuddy/rules/repo-structure/RULE.mdc` 归位表（如受影响） |
 | 入口约束 | `CODEBUDDY.md`（顶层结构、硬性约束或规则索引变化时） |

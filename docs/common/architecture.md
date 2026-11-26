@@ -56,18 +56,27 @@ graph LR
 - 运算量预算制（F103 无 FPU）；数值一致性以容差对齐为判据；延迟实测回填模型。
 - 风险对策：模型失配 → 辨识数据校准回流（迭代而非瀑布）；一致性偏差超容差 → 对拍关卡拦截；实时性超预算 → 结构简化。
 
-## 6. 顶层目录结构（二级目录在对应任务规划时细化）
+## 6. 顶层目录结构（二级目录由 D12 定稿）
 
 ```
 motorControl/
 ├── README.md            # 项目主页
+├── CODEBUDDY.md         # AI 协作规范入口
 ├── .gitignore           # 忽略规则（构建产物、运行数据、IDE 内部目录等）
 ├── requirements.txt     # 阶段一 Python 依赖（numpy/scipy/matplotlib/pytest）
-├── docs/                # 文档：设计决策、架构、各子任务规划文档
-├── sims/                # 仿真：被控对象模型、场景激励与控制内核联调（阶段一）
-└── firmware/            # 嵌入式代码：F103 实时层 + 6ULL 工具层（阶段二）
+├── docs/                # 文档（二级布局见 D12）
+│   ├── common/          # 跨阶段文档：architecture.md、design_decisions.md
+│   ├── sim/             # 阶段一：任务规划（plan_step*.md）、仿真实验报告
+│   └── hardware/        # 阶段二：固件设计、标定与实测报告
+│                        # docs/ 根级仅放最终三方案对比报告（任务⑩落位）
+├── sims/                # 仿真（阶段一全部工作，二级布局见 D12）
+│   ├── plant/           # 被控对象模型（Python）
+│   ├── host/            # 仿真宿主
+│   ├── tests/           # pytest 单测
+│   └── params/          # 参数与场景 JSON（D5/D6 落地位）
+└── firmware/            # 嵌入式代码：F103 实时层 + 6ULL 工具层（阶段二，二级布局任务⑤定稿）
 ```
 
-顶层保持最小集（用户定稿）：算法核心、测试、第三方库、参数与场景数据的目录归属随二级目录设计在任务②/③规划时确定（见 `docs/design_decisions.md` D11）。
+顶层保持最小集（用户定稿，D11）：算法核心的物理落位随任务③二级目录设计确定（见 `docs/common/design_decisions.md` D11/D12）。
 
-接口级契约的完整决策清单见 `docs/design_decisions.md`。
+接口级契约的完整决策清单见 `docs/common/design_decisions.md`。

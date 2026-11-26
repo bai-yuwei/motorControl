@@ -36,7 +36,7 @@ graph LR
     end
 ```
 
-关键约定（见 [docs/design_decisions.md](docs/design_decisions.md)）：
+关键约定（见 [docs/common/design_decisions.md](docs/common/design_decisions.md)）：
 
 - 控制内核：C99，固定步长（速度环 1 kHz / 位置环 250 Hz），POD 接口，归一化占空比输出 `u ∈ [-1, +1]`，无 I/O，无动态内存。
 - 唯一权威参数文件（JSON，纳入版本管理），仿真与固件共用。
@@ -62,8 +62,13 @@ graph LR
 
 | 路径 | 用途 |
 |---|---|
-| `docs/` | 文档：设计决策、架构、各任务计划 |
-| `sims/` | 仿真：对象模型、工况激励与控制内核联调（阶段一） |
+| `docs/common/` | 跨阶段文档：设计决策、架构 |
+| `docs/sim/` | 阶段一文档：任务规划（plan_step*.md）、仿真实验报告 |
+| `docs/hardware/` | 阶段二文档：固件设计、标定与实测报告 |
+| `sims/plant/` | 被控对象模型（Python） |
+| `sims/host/` | 仿真宿主 |
+| `sims/tests/` | 仿真侧单元测试（pytest） |
+| `sims/params/` | 参数与场景 JSON（D5/D6 落地位） |
 | `firmware/` | 嵌入式代码：STM32F103 实时层 + i.MX6ULL 工具（阶段二） |
 
 ## 环境要求
@@ -74,6 +79,7 @@ graph LR
 
 ## 文档
 
-- [docs/architecture.md](docs/architecture.md) —— 两阶段架构、约定、原则
-- [docs/design_decisions.md](docs/design_decisions.md) —— 接口层决策清单（控制内核三个调用方的唯一事实来源）
+- [docs/common/architecture.md](docs/common/architecture.md) —— 两阶段架构、约定、原则
+- [docs/common/design_decisions.md](docs/common/design_decisions.md) —— 接口层决策清单（控制内核三个调用方的唯一事实来源）
+- [docs/sim/plan_step2.md](docs/sim/plan_step2.md) —— 步骤②子任务管理（子 README：状态表、决策登记、续接指引）
 - [CODEBUDDY.md](CODEBUDDY.md) —— 项目规范入口：目录结构约束、编码标准与决策记录机制（详细规则在 `.codebuddy/rules/`）

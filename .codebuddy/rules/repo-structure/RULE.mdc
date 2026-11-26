@@ -8,7 +8,7 @@ provider:
 
 # 仓库目录结构与文件归位规范
 
-依据：`docs/design_decisions.md` D11（顶层目录结构，用户定稿）、`docs/architecture.md` §6。
+依据：`docs/common/design_decisions.md` D11/D12（顶层与二级目录结构）、`docs/common/architecture.md` §6。
 
 ## 1. 顶层结构（唯一合法布局）
 
@@ -18,28 +18,53 @@ motorControl/
 ├── CODEBUDDY.md         # AI 协作规范入口
 ├── .gitignore           # 忽略规则
 ├── requirements.txt     # 阶段一 Python 依赖唯一入口
-├── docs/                # 全部文档
-├── sims/                # 阶段一仿真全部工作（Python 宿主、对象模型、场景、控制内核联调）
-└── firmware/            # 全部目标机代码（F103 实时层 + 6ULL 工具层）
+├── docs/                # 全部文档（二级布局见 §2a）
+├── sims/                # 阶段一仿真全部工作（二级布局见 §2b）
+└── firmware/            # 全部目标机代码（F103 实时层 + 6ULL 工具层；二级布局任务⑤定稿）
 ```
 
-## 2. 文件归位表
+## 2a. docs/ 二级结构与归位表（D12）
+
+```
+docs/
+├── common/              # 跨阶段文档：architecture.md、design_decisions.md
+├── sim/                 # 阶段一：任务规划（plan_step*.md）、仿真实验报告
+├── hardware/            # 阶段二：固件设计、标定与实测报告
+└── （根级仅允许最终三方案对比报告，任务⑩落位）
+```
 
 | 文件类型 | 归属位置 | 说明 |
 |---|---|---|
-| 设计/架构/计划/实验报告文档（.md） | `docs/` | 一律入 docs/，禁止散落在 sims/、firmware/ 或仓库根级 |
-| 仿真侧 Python 模块与脚本（对象模型、场景、宿主、辨识/频域分析、绘图） | `sims/` | 阶段一所有非嵌入式代码 |
-| 仿真侧 C 源（控制内核等联调代码） | `sims/`（过渡规则） | 二级布局在任务③定稿；在此之前新增 C 源暂放 `sims/` 顶层并在提交说明中注明 |
-| 嵌入式 C/头文件/链接脚本（F103、6ULL） | `firmware/` | 二级布局在任务⑤定稿 |
-| Python 依赖 | 根级 `requirements.txt` | 禁止另建 requirements*.txt、environment.yml 等平行清单 |
-| 运行输出（数据、日志、图表产物） | `data/`、`logs/`（不入库） | .gitignore 已排除；禁止提交 |
-| AI 协作规范 | `CODEBUDDY.md`、`.codebuddy/rules/` | 规则纳入版本控制；维护机制见 decision-memory 规则 |
+| 架构、设计决策等跨阶段文档 | `docs/common/` | 全程有效、不随阶段结束失效的文档 |
+| 阶段一任务规划（plan_step*.md）、仿真实验报告 | `docs/sim/` | 每个路线图步骤一份子 README 管理子任务 |
+| 阶段二固件设计、标定与实测报告 | `docs/hardware/` | 与实物/硬件相关的一切文档 |
+| 最终三方案对比报告 | `docs/` 根级 | 唯一根级文档例外（D12） |
+
+禁止将任何 .md 文档散落在 sims/、firmware/ 或仓库根级。
+
+## 2b. sims/ 二级结构与归位表（D12）
+
+```
+sims/
+├── plant/               # 被控对象模型（Python）
+├── host/                # 仿真宿主
+├── tests/               # pytest 单测
+└── params/              # 参数与场景 JSON（D5/D6 落地位）
+```
+
+| 文件类型 | 归属位置 | 说明 |
+|---|---|---|
+| 对象模型 Python 模块（摩擦/死区/量化/延迟等非理想环节） | `sims/plant/` | 被控对象模型及其实例化 |
+| 仿真宿主、场景激励生成、辨识/频域分析、绘图脚本 | `sims/host/` | 只调用算法核心，不实现控制律（D10） |
+| pytest 单测（test_*.py） | `sims/tests/` | 仿真侧全部测试 |
+| 参数与场景 JSON | `sims/params/` | D5 参数契约与 D6 场景契约的数据落位 |
+| 仿真侧 C 源（控制内核等联调代码） | `sims/`（过渡规则） | 算法核心落位任务③定稿；在此之前新增 C 源暂放 `sims/` 顶层并在提交说明中注明 |
 
 ## 3. 新增目录登记流程（强制）
 
 1. 说明新增目录的用途与理由；
-2. 更新 `docs/design_decisions.md`（修订 D11 或新增 D 编号决策，含理由与备选）；
-3. 更新 `docs/architecture.md` §6 目录树；
+2. 更新 `docs/common/design_decisions.md`（修订 D11/D12 或新增 D 编号决策，含理由与备选）；
+3. 更新 `docs/common/architecture.md` §6 目录树；
 4. 经用户确认；
 5. 落目录（含 .gitkeep 占位）并同步 README 仓库结构表。
 
@@ -48,6 +73,7 @@ motorControl/
 ## 4. 禁止事项
 
 - 禁止新建顶层目录（任何新顶层目录均视为违反 D11）。
+- 禁止在 docs/、sims/ 下新建 D12 未登记的二级目录。
 - 禁止将文档放入代码目录、将代码放入 docs/。
 - 禁止提交构建产物（build/、*.o、*.elf 等）与运行数据（data/、logs/）。
 - 禁止在仓库根级堆放脚本或临时文件；临时实验产物一律不入库。

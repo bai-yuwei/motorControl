@@ -8,7 +8,7 @@ provider:
 
 # 编码与提交规范
 
-依据：`docs/design_decisions.md` D1–D4（步长、POD 接口、纯函数纪律、float 数值）。
+依据：`docs/common/design_decisions.md` D1–D4（步长、POD 接口、纯函数纪律、float 数值）。
 
 ## 1. 通用
 

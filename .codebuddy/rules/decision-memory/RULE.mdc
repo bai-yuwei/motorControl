@@ -10,8 +10,8 @@ provider:
 
 ## 1. 决策单一事实源
 
-- 全部设计决策记录于 `docs/design_decisions.md`：D 编号条目 + 文首状态行 + 后置决策清单。
-- 路线图进度唯一事实源：`README.md` 路线图表；架构与目录树唯一事实源：`docs/architecture.md`。
+- 全部设计决策记录于 `docs/common/design_decisions.md`：D 编号条目 + 文首状态行 + 后置决策清单。
+- 路线图进度唯一事实源：`README.md` 路线图表；架构与目录树唯一事实源：`docs/common/architecture.md`；各路线图步骤的子任务进度事实源：对应 `docs/sim/plan_step*.md`（阶段一）或 `docs/hardware/`（阶段二）子 README。
 
 ## 2. 决策记录流程
 
@@ -32,11 +32,11 @@ provider:
 ## 4. 步骤收口检查单
 
 1. 该步骤交付物全部落地（代码/文档/测试）；
-2. 同步文档：`docs/architecture.md`、`docs/design_decisions.md`、`README.md` 仓库结构表（如有变化）；
+2. 同步文档：`docs/common/architecture.md`、`docs/common/design_decisions.md`、对应步骤子 README（docs/sim/ 或 docs/hardware/）、`README.md` 仓库结构表（如有变化）；
 3. 输出变更清单交用户审阅；
 4. 经用户确认后执行 git 提交（提交信息中文）；
 5. 回写 README 路线图状态 ✅（未走完 1–4 不得勾选）。
 
 ## 5. 查阅路径
 
-约定疑问 → `CODEBUDDY.md` 硬性约束 → 对应规则文件 → `docs/` 详细文档。规范与文档冲突时，以 `docs/design_decisions.md` 最新决策为准，并同步修订规范。
+约定疑问 → `CODEBUDDY.md` 硬性约束 → 对应规则文件 → `docs/` 详细文档。规范与文档冲突时，以 `docs/common/design_decisions.md` 最新决策为准，并同步修订规范。
