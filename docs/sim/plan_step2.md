@@ -15,7 +15,7 @@
 
 | # | 子任务 | 状态 | 产出 | 依赖 |
 |---|---|---|---|---|
-| 2.1 | docs/ 与 sims/ 二级目录定稿（D12） | ✅ | D12 决策 + 引用同步 + 目录落地（commit 待填） | — |
+| 2.1 | docs/ 与 sims/ 二级目录定稿（D12） | ✅ | D12 决策 + 引用同步 + 目录落地（commit `9ee83b2`） | — |
 | 2.2 | 对象模型方程与参数化决策 | ⬜ | design_decisions 新决策条目 + plant 参数 schema | 2.1 |
 | 2.3 | Python 对象模型实现 | ⬜ | `sims/plant/` 模块（逐拍推进，非理想环节可独立开关/配置） | 2.2 |
 | 2.4 | 参数与场景文件落地 | ⬜ | `sims/params/` 权威 JSON（controller 占位 + plant 完整 + scenario 最小集） | 2.2 |
