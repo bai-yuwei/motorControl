@@ -76,3 +76,4 @@ graph LR
 
 - [docs/architecture.md](docs/architecture.md) —— 两阶段架构、约定、原则
 - [docs/design_decisions.md](docs/design_decisions.md) —— 接口层决策清单（控制内核三个调用方的唯一事实来源）
+- [CODEBUDDY.md](CODEBUDDY.md) —— 项目规范入口：目录结构约束、编码标准与决策记录机制（详细规则在 `.codebuddy/rules/`）

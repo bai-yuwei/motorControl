@@ -43,8 +43,9 @@ data/
 logs/
 *.log
 
-# CodeBuddy internal artifacts (plan manager files, not part of the public repo)
-.codebuddy/
+# CodeBuddy：内部产物（规划管理文件）不入库；rules 规范纳入版本控制，随库共享
+.codebuddy/*
+!.codebuddy/rules
 
 # OS
 Thumbs.db
