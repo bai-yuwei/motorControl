@@ -1,84 +1,78 @@
 # dc-servo-lab
 
-**Turn a ~¥30 geared encoder motor into a high-performance servo axis — simulation first, then deploy the very same C control core to STM32F103 + i.MX6ULL.**
+**把一枚约 ¥30 的带编码器减速电机改造成高性能伺服轴 —— 先仿真，再把同一套 C 控制内核部署到 STM32F103 + i.MX6ULL。**
 
-This project focuses on one deep problem: *trustworthy migration of servo control algorithms from simulation to real hardware* — system identification, feedforward compensation, disturbance observation (DOB), and frequency-domain validation, wrapped in a rigorous MIL → SIL → PIL workflow borrowed from automotive V-process development.
+本项目聚焦一个深水区问题：*伺服控制算法从仿真到真实硬件的可信迁移* —— 系统辨识、前馈补偿、扰动观测器（DOB）、频域验证，并套用汽车行业 V 流程开发中严格的 MIL → SIL → PIL 工作流。
 
-## Why
+## 为什么做这个
 
-Humanoid robot companies build their own joint actuators (motor + driver + encoder + bus). The core pain points at that layer — torque transparency, friction compensation, sim-to-real gaps — are exactly what this project exercises, on the cheapest possible hardware. Target roles: joint actuator / servo software engineer.
+人形机器人公司都在自研关节执行器（电机 + 驱动器 + 编码器 + 总线）。这一层的核心痛点 —— 力矩透明性、摩擦补偿、sim-to-real 差距 —— 正是本项目要在最便宜的硬件上练手的内容。目标岗位：关节执行器 / 伺服软件工程师。
 
-## Approach
+## 技术路线
 
-- **Phase 1 — Simulation (MIL/SIL)**: build the plant model with explicit non-idealities (Coulomb/viscous friction, PWM deadzone, encoder quantization, control delay), develop the control laws in pure C against it, tune, and freeze a performance baseline.
-- **Phase 2 — Migration (PIL/HIL)**: port the *same* control core to STM32F103 (real-time layer) with i.MX6ULL as the instrumentation/tuning host. A step-by-step conformance test (sim vs. target, same input sequence) is the acceptance gate before any closed-loop run on hardware.
-- **Iteration loop**: measured identification data flows back into the plant model; retuned parameters flow back to the target.
+- **阶段一 —— 仿真（MIL/SIL）**：搭建含显式非理想环节的被控对象模型（库仑/粘性摩擦、PWM 死区、编码器量化、控制延迟），用纯 C 面向该模型开发控制律，调参并冻结性能基线。
+- **阶段二 —— 迁移（PIL/HIL）**：把*同一套*控制内核移植到 STM32F103（实时层），以 i.MX6ULL 作为仪器化/调参主机。任何硬件闭环之前，先通过逐步一致性测试（仿真 vs. 目标机，相同输入序列）作为验收门槛。
+- **迭代闭环**：实测辨识数据回流到对象模型；重新整定的参数回流到目标机。
 
-Final deliverable: a measured three-controller comparison report (tracking RMS, disturbance recovery, sensitivity peak, low-speed creep), reproducible codebase, and demo videos.
+最终交付物：一份基于实测的三种控制器对比报告（跟踪 RMS、扰动恢复、灵敏度峰值、低速爬行）、可复现的代码库，以及演示视频。
 
-## Architecture
+## 架构
 
 ```mermaid
 graph LR
-    subgraph P1 ["Phase 1: Simulation"]
-        M["Plant model<br/>friction/deadzone/quantization/delay"] <--> C["Control core<br/>single-source pure C"]
-        S["Scenarios"] --> C
-        C --> E["Evaluation & tuning"]
-        E --> F["Frozen baseline"]
+    subgraph P1 ["阶段一：仿真"]
+        M["对象模型<br/>摩擦/死区/量化/延迟"] <--> C["控制内核<br/>单一来源纯 C"]
+        S["工况场景"] --> C
+        C --> E["评估与调参"]
+        E --> F["冻结基线"]
     end
-    subgraph P2 ["Phase 2: Migration"]
-        F --> CMP["Conformance gate"]
-        CMP --> H["F103 real-time loop"]
-        H --> I["Identification & calibration"]
-        I -.->|"model feedback"| M
-        H --> D["Deep control validation"]
-        D --> R["Comparison report"]
+    subgraph P2 ["阶段二：迁移"]
+        F --> CMP["一致性门槛"]
+        CMP --> H["F103 实时回路"]
+        H --> I["辨识与标定"]
+        I -.->|"模型反馈"| M
+        H --> D["深度控制验证"]
+        D --> R["对比报告"]
     end
 ```
 
-Key contracts (see [docs/design_decisions.md](docs/design_decisions.md)):
+关键约定（见 [docs/design_decisions.md](docs/design_decisions.md)）：
 
-- Control core: C99, fixed timestep (1 kHz velocity / 250 Hz position), POD interfaces, normalized duty output `u ∈ [-1, +1]`, no I/O, no dynamic memory.
-- One authoritative parameter file (JSON, versioned) shared by simulation and firmware.
-- Same scenario descriptions drive both simulation replay and on-target execution.
-- Closed loop never depends on any communication link.
+- 控制内核：C99，固定步长（速度环 1 kHz / 位置环 250 Hz），POD 接口，归一化占空比输出 `u ∈ [-1, +1]`，无 I/O，无动态内存。
+- 唯一权威参数文件（JSON，纳入版本管理），仿真与固件共用。
+- 同一份工况场景描述，既驱动仿真回放，也驱动目标机执行。
+- 闭环绝不依赖任何通信链路。
 
-## Roadmap
+## 路线图
 
-| # | Step | Status |
+| # | 步骤 | 状态 |
 |---|---|---|
-| 1 | Interface-level contracts + repo skeleton | ✅ |
-| 2 | Plant simulation model (non-idealities configurable) | ⬜ |
-| 3 | Control laws: PI anti-windup → feedforward → DOB (pure C + tests) | ⬜ |
-| 4 | Tuning, scenario tests, frozen simulation baseline | ⬜ |
-| 5 | Target runtime layer (F103 firmware + 6ULL tooling) | ⬜ |
-| 6 | Migration conformance gate (sim vs. target) | ⬜ |
-| 7 | Basic real closed loop + timing measurements | ⬜ |
-| 8 | On-target identification, model calibration loop | ⬜ |
-| 9 | Feedforward/DOB on hardware, frequency-domain validation | ⬜ |
-| 10 | Three-controller comparison, networked joint interface, report | ⬜ |
+| 1 | 接口层约定 + 仓库骨架 | ✅ |
+| 2 | 对象仿真模型（非理想环节可配置） | ⬜ |
+| 3 | 控制律：PI 抗饱和 → 前馈 → DOB（纯 C + 测试） | ⬜ |
+| 4 | 调参、工况测试、冻结仿真基线 | ⬜ |
+| 5 | 目标机运行时层（F103 固件 + 6ULL 工具链） | ⬜ |
+| 6 | 迁移一致性门槛（仿真 vs. 目标机） | ⬜ |
+| 7 | 基础真机闭环 + 时序测量 | ⬜ |
+| 8 | 目标机辨识、模型标定闭环 | ⬜ |
+| 9 | 硬件上前馈/DOB、频域验证 | ⬜ |
+| 10 | 三种控制器对比、联网关节接口、报告 | ⬜ |
 
-## Repository Layout
+## 仓库结构
 
-| Path | Purpose |
+| 路径 | 用途 |
 |---|---|
-| `docs/` | Design decisions, architecture, per-task plans |
-| `sim/` | Plant model & scenario excitation (Phase 1) |
-| `common/ctrl/` | Control core: pure-C control laws (single source of truth) |
-| `firmware/` | STM32F103 real-time layer (Phase 2) |
-| `edge/` | i.MX6ULL tooling: logging, orchestration, tuning |
-| `analysis/` | PC analysis: identification fitting, frequency domain, reports |
-| `tests/` | Host-side unit tests |
-| `tools/` | Scripts: log decoding, conformance comparison |
-| `experiments/` | Experiment runners & metrics |
+| `docs/` | 文档：设计决策、架构、各任务计划 |
+| `sims/` | 仿真：对象模型、工况激励与控制内核联调（阶段一） |
+| `firmware/` | 嵌入式代码：STM32F103 实时层 + i.MX6ULL 工具（阶段二） |
 
-## Requirements
+## 环境要求
 
-- Python 3.11+ with NumPy / SciPy / Matplotlib (Windows native, no GPU needed) — Phase 1
-- Any host C99 compiler + CMake for control-core unit tests
-- Hardware (~¥60–80, plug-and-play, no mechanical assembly): encoder gearmotor, BTS7960 driver, optional W5500 Ethernet module — Phase 2
+- Python 3.11+，含 NumPy / SciPy / Matplotlib（Windows 原生，无需 GPU）—— 阶段一
+- 任意宿主机 C99 编译器 + CMake，用于控制内核单元测试
+- 硬件（约 ¥60–80，即插即用，无需机械装配）：带编码器减速电机、BTS7960 驱动器、可选 W5500 以太网模块 —— 阶段二
 
-## Documentation
+## 文档
 
-- [docs/architecture.md](docs/architecture.md) — two-phase architecture, contracts, principles
-- [docs/design_decisions.md](docs/design_decisions.md) — interface-level decision list (single source of truth for all three callers of the control core)
+- [docs/architecture.md](docs/architecture.md) —— 两阶段架构、约定、原则
+- [docs/design_decisions.md](docs/design_decisions.md) —— 接口层决策清单（控制内核三个调用方的唯一事实来源）

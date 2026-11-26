@@ -1,0 +1,5 @@
+# 阶段一（仿真）Python 依赖，Python 3.11+，Windows 原生
+numpy>=1.26
+scipy>=1.11
+matplotlib>=3.8
+pytest>=8.0
