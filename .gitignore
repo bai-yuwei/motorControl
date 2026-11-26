@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# C / CMake builds
+build/
+build-*/
+cmake-build-*/
+out/
+*.o
+*.obj
+*.a
+*.lib
+
+# ARM / embedded toolchain artifacts
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+*.axf
+*.iex
+*.dep
+*.scvd
+*.uvgx.*
+JLinkLog.txt
+*.jlink
+
+# IDE / editor
+.vscode/
+.idea/
+.clangd/
+*.swp
+
+# Experiment data & logs (kept out of git; use scripts to regenerate)
+data/
+logs/
+*.log
+
+# CodeBuddy internal artifacts (plan manager files, not part of the public repo)
+.codebuddy/
+
+# OS
+Thumbs.db
+.DS_Store
